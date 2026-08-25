@@ -3,6 +3,7 @@ package com.setec.springdb.controller;
 
 import com.setec.springdb.model.Student;
 import com.setec.springdb.model.User;
+import com.setec.springdb.service.RoleService;
 import com.setec.springdb.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,8 @@ public class UserController {
 
     @Autowired
     private UserService service;
+    @Autowired
+    private RoleService roleService;
 
     @GetMapping
     public ResponseEntity<Object> getAllUsers() {
@@ -74,6 +77,11 @@ public class UserController {
                 user.setUsername(userDetails.getUsername());
                 user.setEmail(userDetails.getEmail());
                 user.setPassword(userDetails.getPassword());
+
+                if (userDetails.getRole() != null && userDetails.getRole().getId() != null) {
+                    user.setRole(roleService.getRoleById(userDetails.getRole().getId()));
+                }
+
                 return ResponseEntity.ok(service.saveUser(user));
             }
             Map<String, Object> error = new HashMap<>();
@@ -86,7 +94,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteUser(@PathVariable Long id) {
         try {

@@ -1,6 +1,7 @@
 package com.setec.springdb.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "users")
@@ -19,12 +20,24 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private Role role;
+
     public User() {}
 
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;
+    }
+
+    public User(String username, String email, String password, Role role) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.role = role;
     }
 
     public Long getId() { return id; }
@@ -38,4 +51,12 @@ public class User {
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
+
+    @JsonProperty(value = "role", access = JsonProperty.Access.READ_ONLY)
+    public String getRoleName() {
+        return role != null ? role.getRoleName() : null;
+    }
 }
